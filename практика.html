@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Находка | Модерация объявлений</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #faf8f5;
+            color: #1e2a2f;
+            line-height: 1.5;
+        }
+        :root {
+            --primary: #d4a373;
+            --primary-dark: #b5835a;
+            --secondary: #2c5f2d;
+            --admin: #9b2c1d;
+            --admin-light: #c4452e;
+            --light: #fff9f0;
+            --dark: #2d2a26;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .navbar {
+            background: rgba(255, 248, 240, 0.96);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(212, 163, 115, 0.2);
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            flex-wrap: wrap;
+        }
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #b4653a;
+        }
+        .logo span {
+            color: var(--secondary);
+        }
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-links a, .nav-links button.link-like {
+            text-decoration: none;
+            font-weight: 500;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            color: #3b3a37;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .nav-links a:hover, .nav-links button.link-like:hover {
+            color: var(--primary-dark);
+        }
+        .btn {
+            background: var(--primary);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--primary);
+            color: var(--primary-dark);
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-admin {
+            background: var(--admin);
+            border-color: var(--admin);
+        }
+        .btn-admin:hover {
+            background: var(--admin-light);
+        }
+        .user-greeting {
+            font-weight: 600;
+            background: #e9dfd3;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+        }
+        .admin-badge {
+            background: #9b2c1d;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-left: 8px;
+        }
+        .section {
+            padding: 60px 0;
+        }
+        .hero {
+            text-align: center;
+            background: linear-gradient(135deg, #fff3e8 0%, #fae9db 100%);
+            border-radius: 0 0 48px 48px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.2rem;
+            font-weight: 600;
+            color: #2c4c2b;
+        }
+        .card {
+            background: white;
+            border-radius: 32px;
+            padding: 28px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.05);
+            border: 1px solid #f0e4d8;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 28px;
+            border: 1px solid #e2d5ca;
+            background: #fffdfa;
+            font-family: 'Inter', sans-serif;
+            transition: 0.2s;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(212,163,115,0.2);
+        }
+        .ad-card {
+            background: #ffffffeb;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+            border-left: 6px solid var(--primary);
+            transition: all 0.2s;
+        }
+        .ad-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 30px rgba(0,0,0,0.08);
+        }
+        .ad-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .ad-desc {
+            color: #4b4a47;
+            margin: 12px 0;
+        }
+        .ad-meta {
+            font-size: 0.75rem;
+            color: #b68b6b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .status-pending {
+            background: #f0c674;
+            color: #5e3a1a;
+        }
+        .status-approved {
+            background: #2c5f2d;
+            color: white;
+        }
+        .footer {
+            background: #2d2a26;
+            color: #e2dcd5;
+            padding: 36px 0;
+            margin-top: 40px;
+            text-align: center;
+        }
+        .inline-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+        .hidden {
+            display: none;
+        }
+        @media (max-width: 700px) {
+            .nav-container { flex-direction: column; gap: 12px; }
+            h1 { font-size: 2.2rem; }
+        }
+        .moderation-card {
+            background: #fff7f0;
+            border-left: 6px solid var(--admin);
+        }
+        hr {
+            margin: 20px 0;
+            border-color: #e9dbcf;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="nav-container container">
+        <div class="logo">Находка<span>✦</span></div>
+        <div class="nav-links">
+            <a href="#" id="nav-home">Главная</a>
+            <a href="#" id="nav-about">О нас</a>
+            <a href="#" id="nav-support">Техподдержка</a>
+            <div id="auth-buttons">
+                <button class="btn-outline btn" id="show-login-btn">Вход</button>
+                <button class="btn" id="show-register-btn">Регистрация</button>
+            </div>
+            <div id="user-panel" class="hidden">
+                <span class="user-greeting" id="user-greeting-text"></span>
+                <button class="btn-outline btn" id="logout-btn">Выйти</button>
+                <button class="btn" id="my-ads-btn">Мои заявки</button>
+                <button class="btn btn-primary" id="create-ad-btn">+ Подать объявление</button>
+            </div>
+            <div id="admin-panel" class="hidden">
+                <span class="user-greeting">👑 Админ <span class="admin-badge">MODER</span></span>
+                <button class="btn btn-admin" id="admin-moderation-btn">📋 Модерация</button>
+                <button class="btn-outline btn" id="admin-logout-btn">Выйти</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<main id="app-root"></main>
+
+<div class="footer">
+    <div class="container">
+        <p>✨ Находка — с модерацией объявлений ✨</p>
+        <p style="margin-top: 12px; font-size: 0.8rem;">© 2025 Находка | Админ: admin@nakhodka.ru / admin123</p>
+    </div>
+</div>
+
+<script>
+    // ======================== ДАННЫЕ ========================
+    // users: { id, email, password, name, role: 'user' or 'admin' }
+    let users = JSON.parse(localStorage.getItem('nakhodka_users_v2')) || [];
+    // объявления: { id, userId, userName, title, description, createdAt, status: 'pending'/'approved', moderatedBy }
+    let ads = JSON.parse(localStorage.getItem('nakhodka_ads_v2')) || [];
+    
+    let currentUser = null;
+
+    // ИНИЦИАЛИЗАЦИЯ: админ и демо-пользователь
+    function initData() {
+        let changed = false;
+        if (users.length === 0) {
+            users.push({ id: 'admin1', email: 'admin@nakhodka.ru', password: 'admin123', name: 'Администратор', role: 'admin' });
+            users.push({ id: 'user1', email: 'anna@find.ru', password: 'anna123', name: 'Анна', role: 'user' });
+            users.push({ id: 'user2', email: 'artem@mail.ru', password: 'artem123', name: 'Артем', role: 'user' });
+            changed = true;
+        }
+        if (ads.length === 0) {
+            ads.push({ id: 'ad1', userId: 'user1', userName: 'Анна', title: 'Винтажная лампа', description: 'Рабочая, стиль 70-х, отличное состояние.', createdAt: new Date().toLocaleString(), status: 'approved', moderatedBy: 'admin1' });
+            ads.push({ id: 'ad2', userId: 'user2', userName: 'Артем', title: 'Книги по искусству', description: '3 тома, как новые.', createdAt: new Date().toLocaleString(), status: 'approved', moderatedBy: 'admin1' });
+            ads.push({ id: 'ad3', userId: 'user1', userName: 'Анна', title: 'Керамическая кружка ручной работы', description: 'Уникальная вещь, ждёт одобрения.', createdAt: new Date().toLocaleString(), status: 'pending', moderatedBy: null });
+            changed = true;
+        }
+        if (changed) {
+            localStorage.setItem('nakhodka_users_v2', JSON.stringify(users));
+            localStorage.setItem('nakhodka_ads_v2', JSON.stringify(ads));
+        }
+    }
+    initData();
+
+    function saveData() {
+        localStorage.setItem('nakhodka_users_v2', JSON.stringify(users));
+        localStorage.setItem('nakhodka_ads_v2', JSON.stringify(ads));
+    }
+
+    // helper: обновить userName в объявлениях
+    function syncUserNames() {
+        ads = ads.map(ad => {
+            const user = users.find(u => u.id === ad.userId);
+            if (user) ad.userName = user.name;
+            return ad;
+        });
+        saveData();
+    }
+
+    // ---------- UI ВСПОМОГАТЕЛЬНЫЕ ----------
+    function showModal(title, content, isError = false) {
+        const modalDiv = document.createElement('div');
+        modalDiv.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter: blur(4px); display:flex; align-items:center; justify-content:center; z-index:1000;';
+        const box = document.createElement('div');
+        box.style.cssText = 'background:white; border-radius:32px; padding:28px; max-width:400px; width:90%; text-align:center; box-shadow:0 20px 35px rgba(0,0,0,0.2);';
+        box.innerHTML = `
+            <h3 style="color: ${isError ? '#c53a1f' : '#2c5f2d'};">${title}</h3>
+            <p style="margin:16px 0;">${content}</p>
+            <button class="btn" id="closeModalBtn">Закрыть</button>
+        `;
+        modalDiv.appendChild(box);
+        document.body.appendChild(modalDiv);
+        document.getElementById('closeModalBtn').onclick = () => modalDiv.remove();
+    }
+
+    // регистрация обычного пользователя (только role:user)
+    function register(email, password, name) {
+        if (!email || !password || !name) { showModal('Ошибка', 'Заполните все поля!', true); return false; }
+        if (users.find(u => u.email === email)) { showModal('Ошибка', 'Email уже используется', true); return false; }
+        const newUser = { id: Date.now().toString(), email, password, name, role: 'user' };
+        users.push(newUser);
+        saveData();
+        showModal('Успех', 'Регистрация прошла! Теперь войдите в аккаунт.');
+        return true;
+    }
+
+    function login(email, password) {
+        const user = users.find(u => u.email === email && u.password === password);
+        if (user) {
+            currentUser = user;
+            updateAuthUI();
+            showModal('Добро пожаловать!', `${user.role === 'admin' ? 'Администратор' : user.name}, вы вошли в систему.`);
+            renderCurrentSection();
+            return true;
+        } else {
+            showModal('Ошибка', 'Неверный email или пароль', true);
+            return false;
+        }
+    }
+
+    function logout() {
+        currentUser = null;
+        updateAuthUI();
+        showModal('Выход', 'Вы вышли из аккаунта');
+        renderCurrentSection();
+    }
+
+    // подать объявление (статус pending)
+    function submitAd(title, description) {
+        if (!currentUser || currentUser.role !== 'user') {
+            showModal('Ошибка', 'Только обычные пользователи могут подавать объявления', true);
+            return false;
+        }
+        if (!title.trim() || !description.trim()) {
+            showModal('Ошибка', 'Заполните заголовок и описание', true);
+            return false;
+        }
+        const newAd = {
+            id: Date.now().toString(),
+            userId: currentUser.id,
+            userName: currentUser.name,
+            title: title.trim(),
+            description: description.trim(),
+            createdAt: new Date().toLocaleString(),
+            status: 'pending',
+            moderatedBy: null
+        };
+        ads.push(newAd);
+        saveData();
+        showModal('Заявка отправлена', 'Ваше объявление отправлено на модерацию. Администратор рассмотрит его в ближайшее время.');
+        renderCurrentSection();
+        return true;
+    }
+
+    // модерация: approve
+    function approveAd(adId) {
+        const ad = ads.find(a => a.id === adId);
+        if (ad && ad.status === 'pending') {
+            ad.status = 'approved';
+            ad.moderatedBy = currentUser?.id || 'admin';
+            saveData();
+            showModal('Одобрено', 'Объявление опубликовано на сайте.');
+            renderCurrentSection();
+        }
+    }
+
+    function rejectAd(adId) {
+        ads = ads.filter(a => a.id !== adId);
+        saveData();
+        showModal('Отклонено', 'Объявление удалено из очереди.');
+        renderCurrentSection();
+    }
+
+    // удалить своё объявление (только если статус pending, либо для админа)
+    function deleteAdByUser(adId) {
+        const ad = ads.find(a => a.id === adId);
+        if (ad && currentUser && (ad.userId === currentUser.id || currentUser.role === 'admin')) {
+            ads = ads.filter(a => a.id !== adId);
+            saveData();
+            showModal('Удалено', 'Объявление удалено.');
+            renderCurrentSection();
+        } else {
+            showModal('Ошибка', 'Нельзя удалить это объявление', true);
+        }
+    }
+
+    // UI состояния
+    function updateAuthUI() {
+        const authDiv = document.getElementById('auth-buttons');
+        const userPanelDiv = document.getElementById('user-panel');
+        const adminPanelDiv = document.getElementById('admin-panel');
+        const greetingSpan = document.getElementById('user-greeting-text');
+        
+        if (!currentUser) {
+            authDiv.classList.remove('hidden');
+            userPanelDiv.classList.add('hidden');
+            adminPanelDiv.classList.add('hidden');
+        } else if (currentUser.role === 'admin') {
+            authDiv.classList.add('hidden');
+            userPanelDiv.classList.add('hidden');
+            adminPanelDiv.classList.remove('hidden');
+        } else {
+            authDiv.classList.add('hidden');
+            userPanelDiv.classList.remove('hidden');
+            adminPanelDiv.classList.add('hidden');
+            if (greetingSpan) greetingSpan.innerText = `${currentUser.name} ✨`;
+        }
+    }
+
+    // ======================== РЕНДЕР СЕКЦИЙ ========================
+    let currentSection = 'home'; // home, about, support, createAd, myAds, adminModeration
+
+    function renderHome() {
+        const approvedAds = ads.filter(ad => ad.status === 'approved');
+        return `
+            <div class="hero">
+                <div class="container" style="padding: 48px 0;">
+                    <h1>Находка <span>✦</span></h1>
+                    <p style="font-size: 1.2rem; max-width: 600px; margin: 16px auto;">Проверенные объявления от реальных людей. Администратор модерирует каждое предложение.</p>
+                </div>
+            </div>
+            <div class="container section">
+                <h2 style="font-size: 1.8rem; margin-bottom: 28px;"><i class="fas fa-check-circle"></i> Опубликованные объявления</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px,1fr)); gap: 24px;">
+                    ${approvedAds.map(ad => `
+                        <div class="ad-card">
+                            <div class="ad-title">${escapeHtml(ad.title)}</div>
+                            <div class="ad-desc">${escapeHtml(ad.description)}</div>
+                            <div class="ad-meta">
+                                <span><i class="far fa-user"></i> ${escapeHtml(ad.userName)}</span>
+                                <span><i class="far fa-calendar-alt"></i> ${ad.createdAt || 'недавно'}</span>
+                                ${currentUser && (currentUser.id === ad.userId || currentUser.role === 'admin') ? `<button class="btn-outline btn" style="padding: 4px 12px; font-size:0.75rem;" data-delete="${ad.id}">Удалить</button>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                ${approvedAds.length === 0 ? '<div class="card" style="text-align:center;">Нет опубликованных объявлений — ожидайте модерации</div>' : ''}
+            </div>
+        `;
+    }
+
+    function renderAbout() {
+        return `<div class="container section"><div class="card" style="text-align:center; max-width:800px; margin:0 auto;"><i class="fas fa-shield-alt" style="font-size:3rem; color:var(--primary);"></i><h2 style="margin:20px 0 12px;">О нас</h2><p>«Находка» — платформа с модерацией. Каждое объявление проверяется администратором перед публикацией, чтобы вы видели только качественные предложения. Подать объявление может любой зарегистрированный пользователь.</p><p style="margin-top:20px;">✨ Безопасно, честно, прозрачно ✨</p></div></div>`;
+    }
+
+    function renderSupport() {
+        return `<div class="container section"><div class="card"><h2><i class="fas fa-headset"></i> Техподдержка</h2><p>Если ваше объявление долго не публикуется, свяжитесь с нами.</p><div class="grid-2" style="margin-top:28px;"><div><i class="fas fa-envelope"></i> mod@nakhodka.ru</div><div><i class="fab fa-telegram"></i> @nakhodka_admin</div><div><i class="fas fa-clock"></i> Ответ в течение 12 часов</div></div><hr><h3>Как проходит модерация?</h3><p>После подачи объявление попадает в очередь к администратору. Обычно проверка занимает до 24 часов.</p></div></div>`;
+    }
+
+    function renderCreateAd() {
+        if (!currentUser || currentUser.role !== 'user') {
+            return `<div class="container section"><div class="card"><p>🔒 Только зарегистрированные пользователи могут подавать объявления. <a href="#" id="gotoLogin">Войти</a></p></div></div>`;
+        }
+        return `
+            <div class="container section">
+                <div class="card" style="max-width:700px; margin:0 auto;">
+                    <h2><i class="fas fa-pen-alt"></i> Подать объявление на модерацию</h2>
+                    <p style="color:#9b6e48; margin-bottom:16px;">После отправки администратор проверит и опубликует его.</p>
+                    <form id="create-ad-form">
+                        <div class="form-group"><label>Заголовок</label><input type="text" id="ad-title" placeholder="Например: Ретро-радиоприемник" required></div>
+                        <div class="form-group"><label>Описание</label><textarea rows="4" id="ad-desc" placeholder="Состояние, цена, детали..."></textarea></div>
+                        <div class="inline-buttons"><button type="submit" class="btn btn-primary">Отправить на проверку</button><button type="button" id="cancel-create" class="btn-outline btn">Отмена</button></div>
+                    </form>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderMyAds() {
+        if (!currentUser || currentUser.role !== 'user') return `<div class="container section"><div class="card"><p>Войдите как пользователь, чтобы увидеть свои заявки.</p></div></div>`;
+        const myAds = ads.filter(ad => ad.userId === currentUser.id);
+        return `
+            <div class="container section">
+                <h2>📋 Мои заявки и объявления</h2>
+                ${myAds.length === 0 ? '<div class="card"><p>Вы ещё не подавали объявления. Нажмите «+ Подать объявление».</p></div>' : `
+                    <div style="display:grid; gap:20px;">
+                        ${myAds.map(ad => `
+                            <div class="ad-card" style="border-left-color: ${ad.status === 'approved' ? '#2c5f2d' : '#f0c674'}">
+                                <div class="ad-title">${escapeHtml(ad.title)} <span class="status-badge ${ad.status === 'approved' ? 'status-approved' : 'status-pending'}">${ad.status === 'approved' ? 'Опубликовано' : 'На модерации'}</span></div>
+                                <div class="ad-desc">${escapeHtml(ad.description)}</div>
+                                <div class="ad-meta">Создано: ${ad.createdAt || ''}</div>
+                                <button class="btn-outline btn" style="margin-top:12px;" data-delete="${ad.id}"><i class="fas fa-trash-alt"></i> Удалить заявку</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `}
+                <button id="back-to-home" class="btn" style="margin-top:30px;">← На главную</button>
+            </div>
+        `;
+    }
+
+    function renderAdminModeration() {
+        if (!currentUser || currentUser.role !== 'admin') {
+            return `<div class="container"><p>Доступ запрещён.</p></div>`;
+        }
+        const pendingAds = ads.filter(ad => ad.status === 'pending');
+        return `
+            <div class="container section">
+                <div class="card">
+                    <h2><i class="fas fa-gavel"></i> Панель модерации</h2>
+                    <p>Объявления, ожидающие проверки (${pendingAds.length})</p>
+                    ${pendingAds.length === 0 ? '<p style="margin-top:20px;">✅ Все объявления проверены, очередь пуста.</p>' : ''}
+                    <div style="margin-top:24px; display:grid; gap:24px;">
+                        ${pendingAds.map(ad => `
+                            <div class="ad-card moderation-card">
+                                <div class="ad-title">${escapeHtml(ad.title)}</div>
+                                <div class="ad-desc">${escapeHtml(ad.description)}</div>
+                                <div class="ad-meta"><span><i class="far fa-user"></i> Автор: ${escapeHtml(ad.userName)}</span><span>${ad.createdAt}</span></div>
+                                <div class="inline-buttons" style="margin-top:16px;">
+                                    <button class="btn btn-primary" data-approve="${ad.id}">✅ Одобрить и опубликовать</button>
+                                    <button class="btn-outline btn" data-reject="${ad.id}">❌ Отклонить</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <hr>
+                    <button id="admin-back-home" class="btn-outline btn">На главную</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m;}); }
+
+    function attachEvents() {
+        // удаление через data-delete
+        document.querySelectorAll('[data-delete]').forEach(btn => {
+            btn.removeEventListener('click', handleDelete);
+            btn.addEventListener('click', handleDelete);
+        });
+        document.querySelectorAll('[data-approve]').forEach(btn => {
+            btn.removeEventListener('click', handleApprove);
+            btn.addEventListener('click', handleApprove);
+        });
+        document.querySelectorAll('[data-reject]').forEach(btn => {
+            btn.removeEventListener('click', handleReject);
+            btn.addEventListener('click', handleReject);
+        });
+        const cancelBtn = document.getElementById('cancel-create');
+        if(cancelBtn) cancelBtn.onclick = () => { currentSection = 'home'; renderCurrentSection(); };
+        const backHome = document.getElementById('back-to-home');
+        if(backHome) backHome.onclick = () => { currentSection = 'home'; renderCurrentSection(); };
+        const adminBack = document.getElementById('admin-back-home');
+        if(adminBack) adminBack.onclick = () => { currentSection = 'home'; renderCurrentSection(); };
+        const formCreate = document.getElementById('create-ad-form');
+        if(formCreate) {
+            formCreate.onsubmit = (e) => {
+                e.preventDefault();
+                const title = document.getElementById('ad-title').value;
+                const desc = document.getElementById('ad-desc').value;
+                submitAd(title, desc);
+            };
+        }
+        const gotoLogin = document.getElementById('gotoLogin');
+        if(gotoLogin) gotoLogin.onclick = (e) => { e.preventDefault(); showLoginModal(); };
+    }
+
+    function handleDelete(e) {
+        const id = e.currentTarget.getAttribute('data-delete');
+        if(id) deleteAdByUser(id);
+    }
+    function handleApprove(e) {
+        const id = e.currentTarget.getAttribute('data-approve');
+        if(id) approveAd(id);
+    }
+    function handleReject(e) {
+        const id = e.currentTarget.getAttribute('data-reject');
+        if(id) rejectAd(id);
+    }
+
+    function renderCurrentSection() {
+        let html = '';
+        if (currentSection === 'home') html = renderHome();
+        else if (currentSection === 'about') html = renderAbout();
+        else if (currentSection === 'support') html = renderSupport();
+        else if (currentSection === 'createAd') html = renderCreateAd();
+        else if (currentSection === 'myAds') html = renderMyAds();
+        else if (currentSection === 'adminModeration') html = renderAdminModeration();
+        else html = renderHome();
+        document.getElementById('app-root').innerHTML = html;
+        attachEvents();
+    }
+
+    // Модальные формы логина/регистрации
+    function showLoginModal() {
+        const modalDiv = document.createElement('div');
+        modalDiv.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter: blur(3px); display:flex; align-items:center; justify-content:center; z-index:1000;';
+        const box = document.createElement('div');
+        box.style.cssText = 'background:white; border-radius:32px; padding:32px; width:350px;';
+        box.innerHTML = `<h3>Вход</h3><div class="form-group"><label>Email</label><input id="login-email" placeholder="demo@find.ru"></div><div class="form-group"><label>Пароль</label><input id="login-password" type="password" placeholder="****"></div><div class="inline-buttons"><button id="do-login" class="btn">Войти</button><button id="close-modal" class="btn-outline btn">Отмена</button></div><p style="margin-top:12px; font-size:0.8rem;">Админ: admin@nakhodka.ru / admin123</p>`;
+        modalDiv.appendChild(box);
+        document.body.appendChild(modalDiv);
+        const close = () => modalDiv.remove();
+        document.getElementById('close-modal').onclick = close;
+        document.getElementById('do-login').onclick = () => {
+            const email = document.getElementById('login-email').value;
+            const pwd = document.getElementById('login-password').value;
+            login(email, pwd);
+            close();
+        };
+    }
+
+    function showRegisterModal() {
+        const modalDiv = document.createElement('div');
+        modalDiv.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter: blur(3px); display:flex; align-items:center; justify-content:center; z-index:1000;';
+        const box = document.createElement('div');
+        box.style.cssText = 'background:white; border-radius:32px; padding:32px; width:380px;';
+        box.innerHTML = `<h3>Регистрация (пользователь)</h3><div class="form-group"><label>Имя</label><input id="reg-name"></div><div class="form-group"><label>Email</label><input id="reg-email"></div><div class="form-group"><label>Пароль</label><input id="reg-password" type="password"></div><div class="inline-buttons"><button id="do-register" class="btn">Зарегистрироваться</button><button id="close-reg-modal" class="btn-outline btn">Отмена</button></div>`;
+        modalDiv.appendChild(box);
+        document.body.appendChild(modalDiv);
+        const close = () => modalDiv.remove();
+        document.getElementById('close-reg-modal').onclick = close;
+        document.getElementById('do-register').onclick = () => {
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const pwd = document.getElementById('reg-password').value;
+            register(email, pwd, name);
+            close();
+        };
+    }
+
+    // Навигация
+    document.getElementById('nav-home').onclick = (e) => { e.preventDefault(); currentSection = 'home'; renderCurrentSection(); };
+    document.getElementById('nav-about').onclick = (e) => { e.preventDefault(); currentSection = 'about'; renderCurrentSection(); };
+    document.getElementById('nav-support').onclick = (e) => { e.preventDefault(); currentSection = 'support'; renderCurrentSection(); };
+    document.getElementById('show-login-btn').onclick = () => showLoginModal();
+    document.getElementById('show-register-btn').onclick = () => showRegisterModal();
+    document.getElementById('logout-btn').onclick = () => logout();
+    document.getElementById('admin-logout-btn') && (document.getElementById('admin-logout-btn').onclick = () => logout());
+    document.getElementById('create-ad-btn').onclick = () => { if(currentUser && currentUser.role === 'user') { currentSection = 'createAd'; renderCurrentSection(); } else showModal('Доступ', 'Только пользователи могут подавать объявления. Зарегистрируйтесь!', true); };
+    document.getElementById('my-ads-btn').onclick = () => { if(currentUser && currentUser.role === 'user') { currentSection = 'myAds'; renderCurrentSection(); } else showModal('Доступ', 'Войдите как пользователь', true); };
+    document.getElementById('admin-moderation-btn') && (document.getElementById('admin-moderation-btn').onclick = () => { if(currentUser && currentUser.role === 'admin') { currentSection = 'adminModeration'; renderCurrentSection(); } });
+    
+    updateAuthUI();
+    renderCurrentSection();
+</script>
+</body>
+</html>
